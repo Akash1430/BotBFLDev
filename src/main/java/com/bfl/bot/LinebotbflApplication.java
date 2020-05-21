@@ -28,7 +28,7 @@ public class LinebotbflApplication {
     	final String followedUserId = event.getSource().getUserId();
     	
         LineMessagingClient client = LineMessagingClient.builder(
-                "O6IUy8JB2CUmA4Lym7lpbWHMYMmdwCzbkSW58fDESjWLaSqzz5mtYo6AYvcf6w6rA3EviFGdz/JXumg3rXg122+9PzXwYy5Fnos2WKYncIY9cIOLfLR8SQc5qMUA1wrRNQHbd1KI7JzixTJhRY8C9wdB04t89/1O/w1cDnyilFU=")
+                "h9CYzPXg/rTBqqqqzzzkkSHn0IwelbzkGPp16JytO06iROwfrvW+rgEwsoEq0ZTDKwsNMnEiJ/3Dc3YYo9RioYNl2eBXNWtqu27jGzzUFeSNQnI59PhcbeYjpe83L9NunkszEg/TXe2Q5RLTGrwSIQdB04t89/1O/w1cDnyilFU=")
                 .build();
         UserProfileResponse userProfileResponse = null;
         try {
