@@ -84,6 +84,7 @@ public class LinebotbflApplication {
     public String getFromSalesforce(String originalMessage) {
         HttpClient httpclient = HttpClientBuilder.create().build();
 
+
         String loginURL = LOGINURL + GRANTSERVICE + "&client_id=" + CLIENTID + "&client_secret=" + CLIENTSECRET
                 + "&username=" + USERNAME + "&password=" + PASSWORD;
 
