@@ -85,7 +85,12 @@ public class LinebotbflApplication {
     public String getMessage(String originalMessage) 
     {
 
-        String uri = baseUri + "/query/?q=Select+" + "value__c+" + "From+" + "BotKnowledgeBase__c+" + "Where+" + "Name+"
+		/*
+		 * String uri = baseUri + "/query/?q=Select+" + "value__c+" + "From+" +
+		 * "BotKnowledgeBase__c+" + "Where+" + "Name+" + "=+" + "'" + originalMessage +
+		 * "'";
+		 */
+    	String uri = baseUri + "/query/?q=Select+" + "vaultvalue__c+" + "From+" + "vault__c+" + "Where+" + "Name+"
                 + "=+" + "'" + originalMessage + "'";
 System.out.println("url sending to sf: " + uri);
         try {
