@@ -114,7 +114,7 @@ System.out.println("url sending to sf: " + uri);
                     String result = "";
                     JSONArray jsonArray = jsonObject.getJSONArray("records");
                     for (int i = 0; i < jsonArray.length(); i++) {
-                        result = jsonObject.getJSONArray("records").getJSONObject(i).getString("vaultvalue__c");
+                        result = jsonObject.getJSONArray("records").getJSONObject(i).getString("value__c");
                     }
                     return result;
                 } else {
