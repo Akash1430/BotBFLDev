@@ -46,7 +46,7 @@ public class LinebotbflApplication {
     private static String API_VERSION = "/v43.0";
     private static String baseUri;
     private static Header oauthHeader;
-    //private static Header prettyPrintHeader = new BasicHeader("X-PrettyPrint", "1");
+    private static Header prettyPrintHeader = new BasicHeader("X-PrettyPrint", "1");
     //private static String leadId;
     //private static String contactId;
     
@@ -96,10 +96,12 @@ public class LinebotbflApplication {
 
                 HttpGet httpGet = new HttpGet(uri);
                 httpGet.addHeader(oauthHeader);
+                httpGet.addHeader(prettyPrintHeader);
                 int statusCode = 0;
                 HttpResponse response;
                 try {
                     response = httpClient.execute(httpGet);
+                    System.out.println("response is :"+ response);
                     statusCode = response.getStatusLine().getStatusCode();
                 } catch (Exception e) {
                     System.out.println(uri + " error ee: " + e.toString());
