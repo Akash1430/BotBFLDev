@@ -62,7 +62,7 @@ public class LinebotbflApplication {
     	String originalMessageText = event.getMessage().getText().toUpperCase();
     	String replyBotMessage = getMessage(originalMessageText);
 		
-		 if(replyBotMessage == null) { 
+		 if(replyBotMessage == null || replyBotMessage == "") { 
 			 replyBotMessage = "Line Id: " + followedUserId;
 		 }
 		 
