@@ -35,7 +35,7 @@ public class LinebotbflApplication {
 
 	String loginAccessToken = null;
 	
-    static final String USERNAME = "jamaaloozeerally@icbworks.com";
+    static final String USERNAME = "jamaal.oozeerally@brave-bear-o79nob.com";
     static final String PASSWORD = "ICBzamooz1!LabQvUsuXSAoT3MgKjTOYQgf1";
     static final String LOGINURL = "https://login.salesforce.com";
     static final String GRANTSERVICE = "/services/oauth2/token?grant_type=password";
@@ -85,12 +85,7 @@ public class LinebotbflApplication {
     public String getMessage(String originalMessage) 
     {
 
-		/*
-		 * String uri = baseUri + "/query/?q=Select+" + "value__c+" + "From+" +
-		 * "BotKnowledgeBase__c+" + "Where+" + "Name+" + "=+" + "'" + originalMessage +
-		 * "'";
-		 */
-    	String uri = baseUri + "/query/?q=Select+" + "vaultvalue__c+" + "From+" + "vault__c+" + "Where+" + "Name+"
+        String uri = baseUri + "/query/?q=Select+" + "value__c+" + "From+" + "BotKnowledgeBase__c+" + "Where+" + "Name+"
                 + "=+" + "'" + originalMessage + "'";
 System.out.println("url sending to sf: " + uri);
         try {
