@@ -57,9 +57,7 @@ public class LinebotbflApplication {
     @EventMapping
     public TextMessage handleTextMessageEvent(MessageEvent<TextMessageContent> event) {
     	//String senderName = "Sender";
-    	if(loginAccessToken == null) {
-    		CreateConnection();
-    	}
+    	CreateConnection();
     	final String followedUserId = event.getSource().getUserId();
     	String originalMessageText = event.getMessage().getText().toUpperCase();
     	String replyBotMessage = getMessage(originalMessageText);
