@@ -61,10 +61,11 @@ public class LinebotbflApplication {
     	final String followedUserId = event.getSource().getUserId();
     	String originalMessageText = event.getMessage().getText().toUpperCase();
     	String replyBotMessage = getMessage(originalMessageText);
-		/*
-		 * if(replyBotMessage == null) { replyBotMessage = "Line Id: " + followedUserId;
-		 * }
-		 */
+		
+		 if(replyBotMessage == null) { 
+			 replyBotMessage = "Line Id: " + followedUserId;
+		 }
+		 
 		/*
 		 * LineMessagingClient client = LineMessagingClient.builder(
 		 * "h9CYzPXg/rTBqqqqzzzkkSHn0IwelbzkGPp16JytO06iROwfrvW+rgEwsoEq0ZTDKwsNMnEiJ/3Dc3YYo9RioYNl2eBXNWtqu27jGzzUFeSNQnI59PhcbeYjpe83L9NunkszEg/TXe2Q5RLTGrwSIQdB04t89/1O/w1cDnyilFU=")
