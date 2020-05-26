@@ -61,21 +61,22 @@ public class LinebotbflApplication {
     		CreateConnection();
     	}
     	final String followedUserId = event.getSource().getUserId();
-    	//String originalMessageText = event.getMessage().getText();
-    	//String replyBotMessage = getMessage(originalMessageText);
-    	
-        LineMessagingClient client = LineMessagingClient.builder(
-                "h9CYzPXg/rTBqqqqzzzkkSHn0IwelbzkGPp16JytO06iROwfrvW+rgEwsoEq0ZTDKwsNMnEiJ/3Dc3YYo9RioYNl2eBXNWtqu27jGzzUFeSNQnI59PhcbeYjpe83L9NunkszEg/TXe2Q5RLTGrwSIQdB04t89/1O/w1cDnyilFU=")
-                .build();
-        UserProfileResponse userProfileResponse = null;
-        try {
-            userProfileResponse = client.getProfile(followedUserId).get();
-            //senderName = userProfileResponse.getDisplayName();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
+    	String originalMessageText = event.getMessage().getText().toUpperCase();
+    	String replyBotMessage = getMessage(originalMessageText);
+    	if(replyBotMessage == null) 
+    	{
+    		replyBotMessage = "Line Id: " + followedUserId;
+    	}
+		/*
+		 * LineMessagingClient client = LineMessagingClient.builder(
+		 * "h9CYzPXg/rTBqqqqzzzkkSHn0IwelbzkGPp16JytO06iROwfrvW+rgEwsoEq0ZTDKwsNMnEiJ/3Dc3YYo9RioYNl2eBXNWtqu27jGzzUFeSNQnI59PhcbeYjpe83L9NunkszEg/TXe2Q5RLTGrwSIQdB04t89/1O/w1cDnyilFU=")
+		 * .build(); UserProfileResponse userProfileResponse = null; try {
+		 * userProfileResponse = client.getProfile(followedUserId).get(); //senderName =
+		 * userProfileResponse.getDisplayName(); } catch (InterruptedException |
+		 * ExecutionException e) { e.printStackTrace(); }
+		 */
         
-        return new TextMessage(followedUserId);
+        return new TextMessage(replyBotMessage);
     }
 
     @EventMapping
@@ -103,7 +104,8 @@ public class LinebotbflApplication {
                     response = httpClient.execute(httpGet);
                     statusCode = response.getStatusLine().getStatusCode();
                 } catch (Exception e) {
-                    return uri + " error ee: " + e.toString();
+                    System.out.println(uri + " error ee: " + e.toString());
+                    return null;
                 }
 
                 if (statusCode == 200) {
@@ -116,18 +118,22 @@ public class LinebotbflApplication {
                     }
                     return result;
                 } else {
-                    return uri + "status code: " + statusCode;
+                	System.out.println(uri + "status code: " + statusCode);
+                    return null;
                 }
             } catch (Exception e) {
-                return "error e: " + e.toString();
+            	System.out.println("error e: " + e.toString());
+                return null;
             }
 
         } catch (Exception e) {
-            return "error: " + e.getStackTrace().toString();
+        	System.out.println("error: " + e.getStackTrace().toString());
+            return null;
         }
     }    
     
     public void CreateConnection() {
+    	
         HttpClient httpclient = HttpClientBuilder.create().build();
 
         String loginURL = LOGINURL + GRANTSERVICE + "&client_id=" + CLIENTID + "&client_secret=" + CLIENTSECRET
