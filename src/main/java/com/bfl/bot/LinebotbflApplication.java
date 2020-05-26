@@ -35,15 +35,15 @@ public class LinebotbflApplication {
 
 	String loginAccessToken = null;
 	
-    static final String USERNAME = "jamaal.oozeerally@brave-bear-o79nob.com";
+    static final String USERNAME = "jamaaloozeerally@icbworks.com";
     static final String PASSWORD = "ICBzamooz1!LabQvUsuXSAoT3MgKjTOYQgf1";
-    static final String LOGINURL = "https://jamaal-dev-ed.my.salesforce.com";
+    static final String LOGINURL = "https://login.salesforce.com";
     static final String GRANTSERVICE = "/services/oauth2/token?grant_type=password";
     static final String CLIENTID = "3MVG9tzQRhEbH_K07OH84Qc2SYi8X8zEwJBtw__5XYfndQsVaTM04L3dq1JnJmuc7a8lSeTR.WQ==";
     static final String CLIENTSECRET = "80F71D61E8299EC7B971CCFFEC45469D02BC0ED77B34EC53770D54F8AD3A41B9";
 
     private static String REST_ENDPOINT = "/services/data";
-    private static String API_VERSION = "/v43.0";
+    private static String API_VERSION = "/v48.0";
     private static String baseUri;
     private static Header oauthHeader;
     private static Header prettyPrintHeader = new BasicHeader("X-PrettyPrint", "1");
@@ -87,7 +87,7 @@ public class LinebotbflApplication {
 
         String uri = baseUri + "/query/?q=Select+" + "value__c+" + "From+" + "BotKnowledgeBase__c+" + "Where+" + "Name+"
                 + "=+" + "'" + originalMessage + "'";
-
+System.out.println("url sending to sf: " + uri);
         try {
 
             HttpClient httpClient = HttpClientBuilder.create().build();
