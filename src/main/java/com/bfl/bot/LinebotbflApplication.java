@@ -56,11 +56,13 @@ public class LinebotbflApplication {
 
     @EventMapping
     public TextMessage handleTextMessageEvent(MessageEvent<TextMessageContent> event) {
-    	String senderName = "Sender";
-    	
+    	//String senderName = "Sender";
+    	if(loginAccessToken == null) {
+    		CreateConnection();
+    	}
     	final String followedUserId = event.getSource().getUserId();
-    	String originalMessageText = event.getMessage().getText();
-    	String replyBotMessage = getFromSalesforce(originalMessageText);
+    	//String originalMessageText = event.getMessage().getText();
+    	//String replyBotMessage = getMessage(originalMessageText);
     	
         LineMessagingClient client = LineMessagingClient.builder(
                 "h9CYzPXg/rTBqqqqzzzkkSHn0IwelbzkGPp16JytO06iROwfrvW+rgEwsoEq0ZTDKwsNMnEiJ/3Dc3YYo9RioYNl2eBXNWtqu27jGzzUFeSNQnI59PhcbeYjpe83L9NunkszEg/TXe2Q5RLTGrwSIQdB04t89/1O/w1cDnyilFU=")
@@ -68,12 +70,12 @@ public class LinebotbflApplication {
         UserProfileResponse userProfileResponse = null;
         try {
             userProfileResponse = client.getProfile(followedUserId).get();
-            senderName = userProfileResponse.getDisplayName();
+            //senderName = userProfileResponse.getDisplayName();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
         
-        return new TextMessage(replyBotMessage);
+        return new TextMessage(followedUserId);
     }
 
     @EventMapping
@@ -81,69 +83,10 @@ public class LinebotbflApplication {
         System.out.println("event: " + event);
     }
  
-    public String getFromSalesforce(String originalMessage) {
-        HttpClient httpclient = HttpClientBuilder.create().build();
+    public String getMessage(String originalMessage) 
+    {
 
-
-        String loginURL = LOGINURL + GRANTSERVICE + "&client_id=" + CLIENTID + "&client_secret=" + CLIENTSECRET
-                + "&username=" + USERNAME + "&password=" + PASSWORD;
-
-        // Login requests must be POSTs
-        HttpPost httpPost = new HttpPost(loginURL);
-        HttpResponse response = null;
-
-        try {
-            // Execute the login POST request
-            response = httpclient.execute(httpPost);
-        } catch (ClientProtocolException cpException) {
-            cpException.printStackTrace();
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
-        }
-
-        // verify response is HTTP OK
-        final int statusCode = response.getStatusLine().getStatusCode();
-        if (statusCode != HttpStatus.SC_OK) {
-            System.out.println("Error authenticating to Force.com: " + statusCode);
-            // Error is in EntityUtils.toString(response.getEntity())
-            return null;
-        }
-
-        String getResult = null;
-        try {
-            getResult = EntityUtils.toString(response.getEntity());
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
-        }
-
-        JSONObject jsonObject = null;
-        String loginInstanceUrl = null;
-
-        try {
-            jsonObject = (JSONObject) new JSONTokener(getResult).nextValue();
-            loginAccessToken = jsonObject.getString("access_token");
-            loginInstanceUrl = jsonObject.getString("instance_url");
-        } catch (JSONException jsonException) {
-            jsonException.printStackTrace();
-        }
-
-        baseUri = loginInstanceUrl + REST_ENDPOINT + API_VERSION;
-        oauthHeader = new BasicHeader("Authorization", "OAuth " + loginAccessToken);
-        System.out.println("oauthHeader1: " + oauthHeader);
-        System.out.println("\n" + response.getStatusLine());
-        System.out.println("Successful login");
-        System.out.println("instance URL: " + loginInstanceUrl);
-        System.out.println("access token/session ID: " + loginAccessToken);
-        System.out.println("baseUri: " + baseUri);
-
-        // Get Message
-        //return getMessage(originalMessage);
-        return "Get Message now";
-    }
-
-    public String getMessage(String originalMessage) {
-
-        String uri = baseUri + "/query/?q=Select+" + "vaultvalue__c+" + "From+" + "vault__c+" + "Where+" + "Name+"
+        String uri = baseUri + "/query/?q=Select+" + "value__c+" + "From+" + "BotKnowledgeBase__c+" + "Where+" + "Name+"
                 + "=+" + "'" + originalMessage + "'";
 
         try {
@@ -183,4 +126,57 @@ public class LinebotbflApplication {
             return "error: " + e.getStackTrace().toString();
         }
     }    
+    
+    public void CreateConnection() {
+        HttpClient httpclient = HttpClientBuilder.create().build();
+
+        String loginURL = LOGINURL + GRANTSERVICE + "&client_id=" + CLIENTID + "&client_secret=" + CLIENTSECRET
+                + "&username=" + USERNAME + "&password=" + PASSWORD;
+
+        // Login requests must be POSTs
+        HttpPost httpPost = new HttpPost(loginURL);
+        HttpResponse response = null;
+
+        try {
+            // Execute the login POST request
+            response = httpclient.execute(httpPost);
+        } catch (ClientProtocolException cpException) {
+            cpException.printStackTrace();
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+
+        // verify response is HTTP OK
+        final int statusCode = response.getStatusLine().getStatusCode();
+        if (statusCode != HttpStatus.SC_OK) {
+            System.out.println("Error authenticating to Force.com: " + statusCode);
+        }
+
+        String getResult = null;
+        try {
+            getResult = EntityUtils.toString(response.getEntity());
+        } catch (IOException ioException) {
+            ioException.printStackTrace();
+        }
+
+        JSONObject jsonObject = null;
+        String loginInstanceUrl = null;
+
+        try {
+            jsonObject = (JSONObject) new JSONTokener(getResult).nextValue();
+            loginAccessToken = jsonObject.getString("access_token");
+            loginInstanceUrl = jsonObject.getString("instance_url");
+        } catch (JSONException jsonException) {
+            jsonException.printStackTrace();
+        }
+
+        baseUri = loginInstanceUrl + REST_ENDPOINT + API_VERSION;
+        oauthHeader = new BasicHeader("Authorization", "OAuth " + loginAccessToken);
+        System.out.println("oauthHeader1: " + oauthHeader);
+        System.out.println("\n" + response.getStatusLine());
+        System.out.println("Successful login");
+        System.out.println("instance URL: " + loginInstanceUrl);
+        System.out.println("access token/session ID: " + loginAccessToken);
+        System.out.println("baseUri: " + baseUri);
+    }
 }
