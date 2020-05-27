@@ -71,14 +71,13 @@ public class LinebotbflApplication {
 		 else 
 		 {
 			 contactId = getContactId(followedUserId);
+			 userName = getUserName(followedUserId);
 			 if(contactId == null) {
-				 //get userName
-				 userName = getUserName(followedUserId);
 				 //create a contact
 				 createContact(followedUserId, userName);
-
 			 }else {
 				 //update contact
+				 updateContact(followedUserId, userName);
 			 }
 			 logATask(originalMessageText, replyBotMessage);
 		 }	 
@@ -307,6 +306,50 @@ System.out.println("url sending to sf: " + uri);
         }
     }
 
+    public void updateContact(String lineUserId, String userName) {
+    	
+        String uri = baseUri + "/sobjects/Contact/"+contactId + "?_HttpMethod=PATCH";
+        try {
+
+            // create the JSON object containing the new contact details.
+            JSONObject contact = new JSONObject();
+            contact.put("FirstName", userName + "f");
+            contact.put("LastName", userName + "l");
+            contact.put("LineExternalId__c", lineUserId);
+
+            System.out.println("JSON for contact record to be updated:\n" + contact.toString(1));
+
+            // Construct the objects needed for the request
+            HttpClient httpClient = HttpClientBuilder.create().build();
+
+            HttpPost httpPost = new HttpPost(uri);
+            httpPost.addHeader(oauthHeader);
+            httpPost.addHeader(prettyPrintHeader);
+            // The message we are going to post
+            StringEntity body = new StringEntity(contact.toString(1));
+            body.setContentType("application/json");
+            httpPost.setEntity(body);
+
+            // Make the request
+            HttpResponse response = httpClient.execute(httpPost);
+
+            // Process the results
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode == 201) {
+                System.out.println("Contact Update successful. Status code returned is " + statusCode);
+            } else {
+                System.out.println("Contact  Update unsuccessful. Status code returned is " + statusCode);
+            }
+        } catch (JSONException e) {
+            System.out.println("Issue creating Contact Update JSON or processing results");
+            e.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
+        }
+    }
+    
     private void logATask(String originalMessageText, String replyBotMessage) {
     	String uri = baseUri + "/sobjects/Task/";
     	
