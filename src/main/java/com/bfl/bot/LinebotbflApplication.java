@@ -254,8 +254,8 @@ System.out.println("url sending to sf: " + uri);
     	try {
             JSONObject task = new JSONObject();
             task.put("Description", "Keyword: "+ originalMessageText + "\r\t" + "Response: " + replyBotMessage);
-            task.put("ActivityDate ", LocalDate.now());
-            task.put("Priority ", "Normal");
+            task.put("ActivityDate", LocalDate.now());
+            task.put("Priority", "Normal");
             task.put("Status", "Completed");
             task.put("Subject", "Line Call");
             task.put("TaskSubtype", "Call");
