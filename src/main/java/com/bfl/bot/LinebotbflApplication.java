@@ -37,6 +37,7 @@ public class LinebotbflApplication {
 
 	String loginAccessToken = null;
 	String contactId = null;
+	
     static final String USERNAME = "jamaal.oozeerally@brave-bear-o79nob.com";
     static final String PASSWORD = "ICBzamooz1!sJlZfwSFa3WktCPKcrhuToWr";
     static final String LOGINURL = "https://login.salesforce.com";
@@ -49,8 +50,6 @@ public class LinebotbflApplication {
     private static String baseUri;
     private static Header oauthHeader;
     private static Header prettyPrintHeader = new BasicHeader("X-PrettyPrint", "1");
-    //private static String leadId;
-    //private static String contactId;
     
 	public static void main(String[] args) {
 		SpringApplication.run(LinebotbflApplication.class, args);
@@ -66,21 +65,18 @@ public class LinebotbflApplication {
     	String replyBotMessage = getMessage(originalMessageText);
 		
 		 if(replyBotMessage == null || replyBotMessage == "") { 
-			 replyBotMessage = "Line Id: " + followedUserId;
+			 replyBotMessage = "Line User Id: " + followedUserId;
 		 }
-		 else 
-		 {
-			 contactId = getContactId(followedUserId);
-			 userName = getUserName(followedUserId);
-			 if(contactId == null) {
-				 //create a contact
-				 createContact(followedUserId, userName);
-			 }else {
-				 //update contact
-				 updateContact(followedUserId, userName);
-			 }
-			 logATask(originalMessageText, replyBotMessage);
-		 }	 
+		 
+		 contactId = getContactId(followedUserId);
+		 userName = getUserName(followedUserId);
+		 if(contactId == null) {
+			 createContact(followedUserId, userName);
+		 }else {
+			 updateContact(followedUserId, userName);
+		 }
+		 logATask(originalMessageText, replyBotMessage);
+		  
         
         return new TextMessage(replyBotMessage);
     }
@@ -313,11 +309,11 @@ System.out.println("url sending to sf: " + uri);
 
             // create the JSON object containing the new contact details.
             JSONObject contact = new JSONObject();
-            contact.put("FirstName", userName + "f");
-            contact.put("LastName", userName + "l");
+            contact.put("FirstName", userName);
+            contact.put("LastName", userName);
             contact.put("LineExternalId__c", lineUserId);
 
-            System.out.println("JSON for contact record to be updated:\n" + contact.toString(1));
+            //System.out.println("JSON for contact record to be updated:\n" + contact.toString(1));
 
             // Construct the objects needed for the request
             HttpClient httpClient = HttpClientBuilder.create().build();
