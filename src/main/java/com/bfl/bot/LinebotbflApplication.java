@@ -225,7 +225,7 @@ System.out.println("url sending to sf: " + uri);
                 if (statusCode == 200) {
                     String responseString = EntityUtils.toString(response.getEntity());
                     JSONObject jsonObject = new JSONObject(responseString);
-                    String result = "";
+                    String result = null;
                     JSONArray jsonArray = jsonObject.getJSONArray("records");
                     for (int i = 0; i < jsonArray.length(); i++) {
                         result = jsonObject.getJSONArray("records").getJSONObject(i).getString("Id");
@@ -292,11 +292,10 @@ System.out.println("url sending to sf: " + uri);
             if (statusCode == 201) {
                 String response_string = EntityUtils.toString(response.getEntity());
                 JSONObject json = new JSONObject(response_string);
-                // Store the retrieved contact id to use when we update the contact.
                 contactId = json.getString("id");
-
+                System.out.println("Contact Insertion successful. Status code returned is " + statusCode);
             } else {
-                System.out.println("Insertion unsuccessful. Status code returned is " + statusCode);
+                System.out.println("Contact  Insertion unsuccessful. Status code returned is " + statusCode);
             }
         } catch (JSONException e) {
             System.out.println("Issue creating JSON or processing results");
