@@ -58,7 +58,7 @@ public class LinebotbflApplication {
 
     @EventMapping
     public TextMessage handleTextMessageEvent(MessageEvent<TextMessageContent> event) {
-    	//String senderName = "Sender";
+    	String userName = null;
     	
     	CreateConnection();
     	final String followedUserId = event.getSource().getUserId();
@@ -70,20 +70,18 @@ public class LinebotbflApplication {
 		 }
 		 else 
 		 {
+			 contactId = getContactId(followedUserId);
 			 if(contactId == null) {
-				 contactId = getContactId(followedUserId); 
+				 //get userName
+				 userName = getUserName(followedUserId);
+				 //create a contact
+				 createContact(followedUserId, userName);
+
+			 }else {
+				 //update contact
 			 }
 			 logATask(originalMessageText, replyBotMessage);
-		 }
-		 
-		/*
-		 * LineMessagingClient client = LineMessagingClient.builder(
-		 * "h9CYzPXg/rTBqqqqzzzkkSHn0IwelbzkGPp16JytO06iROwfrvW+rgEwsoEq0ZTDKwsNMnEiJ/3Dc3YYo9RioYNl2eBXNWtqu27jGzzUFeSNQnI59PhcbeYjpe83L9NunkszEg/TXe2Q5RLTGrwSIQdB04t89/1O/w1cDnyilFU=")
-		 * .build(); UserProfileResponse userProfileResponse = null; try {
-		 * userProfileResponse = client.getProfile(followedUserId).get(); //senderName =
-		 * userProfileResponse.getDisplayName(); } catch (InterruptedException |
-		 * ExecutionException e) { e.printStackTrace(); }
-		 */
+		 }	 
         
         return new TextMessage(replyBotMessage);
     }
@@ -248,12 +246,74 @@ System.out.println("url sending to sf: " + uri);
         }
     }
 
+    private String getUserName(String followedUserId) {
+		  LineMessagingClient client = LineMessagingClient.builder(
+				  "h9CYzPXg/rTBqqqqzzzkkSHn0IwelbzkGPp16JytO06iROwfrvW+rgEwsoEq0ZTDKwsNMnEiJ/3Dc3YYo9RioYNl2eBXNWtqu27jGzzUFeSNQnI59PhcbeYjpe83L9NunkszEg/TXe2Q5RLTGrwSIQdB04t89/1O/w1cDnyilFU=")
+		  .build(); 
+		  UserProfileResponse userProfileResponse = null; 
+		  try {
+			  userProfileResponse = client.getProfile(followedUserId).get(); 
+			  return userProfileResponse.getDisplayName(); 
+		  } catch (InterruptedException | ExecutionException e) {
+			  e.printStackTrace(); 
+			  return null;
+		  }
+    }
+    
+    public void createContact(String lineUserId, String userName) {
+    	
+        String uri = baseUri + "/sobjects/Contact/";
+        try {
+
+            // create the JSON object containing the new contact details.
+            JSONObject contact = new JSONObject();
+            contact.put("FirstName", userName);
+            contact.put("LastName", userName);
+            contact.put("LineExternalId__c", lineUserId);
+
+            System.out.println("JSON for contact record to be inserted:\n" + contact.toString(1));
+
+            // Construct the objects needed for the request
+            HttpClient httpClient = HttpClientBuilder.create().build();
+
+            HttpPost httpPost = new HttpPost(uri);
+            httpPost.addHeader(oauthHeader);
+            httpPost.addHeader(prettyPrintHeader);
+            // The message we are going to post
+            StringEntity body = new StringEntity(contact.toString(1));
+            body.setContentType("application/json");
+            httpPost.setEntity(body);
+
+            // Make the request
+            HttpResponse response = httpClient.execute(httpPost);
+
+            // Process the results
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode == 201) {
+                String response_string = EntityUtils.toString(response.getEntity());
+                JSONObject json = new JSONObject(response_string);
+                // Store the retrieved contact id to use when we update the contact.
+                contactId = json.getString("id");
+
+            } else {
+                System.out.println("Insertion unsuccessful. Status code returned is " + statusCode);
+            }
+        } catch (JSONException e) {
+            System.out.println("Issue creating JSON or processing results");
+            e.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
+        }
+    }
+
     private void logATask(String originalMessageText, String replyBotMessage) {
     	String uri = baseUri + "/sobjects/Task/";
     	
     	try {
             JSONObject task = new JSONObject();
-            task.put("Description", "Keyword: "+ originalMessageText + "\r\t" + "Response: " + replyBotMessage);
+            task.put("Description", "Keyword: "+ originalMessageText + "\n" + "Response: " + replyBotMessage);
             task.put("ActivityDate", LocalDate.now());
             task.put("Priority", "Normal");
             task.put("Status", "Completed");
@@ -269,7 +329,7 @@ System.out.println("url sending to sf: " + uri);
             httpPost.addHeader(prettyPrintHeader);
             // The message we are going to post
             StringEntity body = new StringEntity(task.toString(1));
-            System.out.println("body format for task: " +body);
+            //System.out.println("body format for task: " +body);
             body.setContentType("application/json");
             httpPost.setEntity(body);
 
@@ -279,15 +339,16 @@ System.out.println("url sending to sf: " + uri);
             // Process the results
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode == 201) {
-                String response_string = EntityUtils.toString(response.getEntity());
-                JSONObject json = new JSONObject(response_string);
-                System.out.println("Create Task Successful: " +json);
+                //String response_string = EntityUtils.toString(response.getEntity());
+                //JSONObject json = new JSONObject(response_string);
+                //System.out.println("Create Task Successful: " +json);
             } else {
-                System.out.println("Insertion unsuccessful. Status code returned is " + statusCode);
+                //System.out.println("Insertion unsuccessful. Status code returned is " + statusCode);
             }
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
 		
 	}
+
 }
