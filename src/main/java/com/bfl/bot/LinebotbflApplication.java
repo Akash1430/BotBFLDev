@@ -1,6 +1,7 @@
 package com.bfl.bot;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.http.Header;
@@ -10,6 +11,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
@@ -34,7 +36,7 @@ import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 public class LinebotbflApplication {
 
 	String loginAccessToken = null;
-	
+	String contactId = null;
     static final String USERNAME = "jamaal.oozeerally@brave-bear-o79nob.com";
     static final String PASSWORD = "ICBzamooz1!sJlZfwSFa3WktCPKcrhuToWr";
     static final String LOGINURL = "https://login.salesforce.com";
@@ -57,7 +59,7 @@ public class LinebotbflApplication {
     @EventMapping
     public TextMessage handleTextMessageEvent(MessageEvent<TextMessageContent> event) {
     	//String senderName = "Sender";
-    	String contactId = null;
+    	
     	CreateConnection();
     	final String followedUserId = event.getSource().getUserId();
     	String originalMessageText = event.getMessage().getText().toUpperCase();
@@ -68,10 +70,10 @@ public class LinebotbflApplication {
 		 }
 		 else 
 		 {
-			 contactId = getContactId(followedUserId);
-			 System.out.println("Current Contact Id is : " + contactId);
-			 //retrieve contact id using followedUserId from s object contact
-			 //create task object to log a call
+			 if(contactId == null) {
+				 contactId = getContactId(followedUserId); 
+			 }
+			 logATask(originalMessageText, replyBotMessage);
 		 }
 		 
 		/*
@@ -86,7 +88,8 @@ public class LinebotbflApplication {
         return new TextMessage(replyBotMessage);
     }
 
-    @EventMapping
+
+	@EventMapping
     public void handleDefaultMessageEvent(Event event) {
         System.out.println("event: " + event);
     }
@@ -244,4 +247,47 @@ System.out.println("url sending to sf: " + uri);
             return null;
         }
     }
+
+    private void logATask(String originalMessageText, String replyBotMessage) {
+    	String uri = baseUri + "/sobjects/Task/";
+    	
+    	try {
+            JSONObject task = new JSONObject();
+            task.put("Description", "Keyword: "+ originalMessageText + "\r\t" + "Response: " + replyBotMessage);
+            task.put("ActivityDate ", LocalDate.now());
+            task.put("Priority ", "Normal");
+            task.put("Status", "Completed");
+            task.put("Subject", "Line Call");
+            task.put("TaskSubtype", "Call");
+            task.put("WhoId", contactId);
+            System.out.println("JSON for Task record to be inserted:\n" + task.toString(1));
+
+            // Construct the objects needed for the request
+            HttpClient httpClient = HttpClientBuilder.create().build();
+            HttpPost httpPost = new HttpPost(uri);
+            httpPost.addHeader(oauthHeader);
+            httpPost.addHeader(prettyPrintHeader);
+            // The message we are going to post
+            StringEntity body = new StringEntity(task.toString(1));
+            System.out.println("body format for task: " +body);
+            body.setContentType("application/json");
+            httpPost.setEntity(body);
+
+            // Make the request
+            HttpResponse response = httpClient.execute(httpPost);
+            
+            // Process the results
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode == 201) {
+                String response_string = EntityUtils.toString(response.getEntity());
+                JSONObject json = new JSONObject(response_string);
+                System.out.println("Create Task Successful: " +json);
+            } else {
+                System.out.println("Insertion unsuccessful. Status code returned is " + statusCode);
+            }
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
+	}
 }
