@@ -57,6 +57,7 @@ public class LinebotbflApplication {
     @EventMapping
     public TextMessage handleTextMessageEvent(MessageEvent<TextMessageContent> event) {
     	//String senderName = "Sender";
+    	String contactId = null;
     	CreateConnection();
     	final String followedUserId = event.getSource().getUserId();
     	String originalMessageText = event.getMessage().getText().toUpperCase();
@@ -64,6 +65,13 @@ public class LinebotbflApplication {
 		
 		 if(replyBotMessage == null || replyBotMessage == "") { 
 			 replyBotMessage = "Line Id: " + followedUserId;
+		 }
+		 else 
+		 {
+			 contactId = getContactId(followedUserId);
+			 System.out.println("Current Contact Id is : " + contactId);
+			 //retrieve contact id using followedUserId from s object contact
+			 //create task object to log a call
 		 }
 		 
 		/*
@@ -185,5 +193,55 @@ System.out.println("url sending to sf: " + uri);
         System.out.println("instance URL: " + loginInstanceUrl);
         System.out.println("access token/session ID: " + loginAccessToken);
         System.out.println("baseUri: " + baseUri);
+    }
+    
+    public String getContactId(String followedUserId) {
+    	
+        String uri = baseUri + "/query/?q=Select+" + "Id+" + "From+" + "Contact+" + "Where+" + "LineExternalId__c+"
+                + "=+" + "'" + followedUserId + "'";
+        System.out.println("url sending to sf: " + uri);
+        
+        try {
+
+            HttpClient httpClient = HttpClientBuilder.create().build();
+
+            try {
+
+                HttpGet httpGet = new HttpGet(uri);
+                httpGet.addHeader(oauthHeader);
+                httpGet.addHeader(prettyPrintHeader);
+                int statusCode = 0;
+                HttpResponse response;
+                try {
+                    response = httpClient.execute(httpGet);
+                    System.out.println("Contact response is :"+ response);
+                    statusCode = response.getStatusLine().getStatusCode();
+                } catch (Exception e) {
+                    System.out.println(uri + "Contact error ee: " + e.toString());
+                    return null;
+                }
+
+                if (statusCode == 200) {
+                    String responseString = EntityUtils.toString(response.getEntity());
+                    JSONObject jsonObject = new JSONObject(responseString);
+                    String result = "";
+                    JSONArray jsonArray = jsonObject.getJSONArray("records");
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        result = jsonObject.getJSONArray("records").getJSONObject(i).getString("Id");
+                    }
+                    return result;
+                } else {
+                	System.out.println(uri + "Contact status code: " + statusCode);
+                    return null;
+                }
+            } catch (Exception e) {
+            	System.out.println("Contact error e: " + e.toString());
+                return null;
+            }
+
+        } catch (Exception e) {
+        	System.out.println("Contact error: " + e.getStackTrace().toString());
+            return null;
+        }
     }
 }
