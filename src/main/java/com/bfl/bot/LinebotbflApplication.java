@@ -262,7 +262,7 @@ System.out.println("url sending to sf: " + uri);
 
             // create the JSON object containing the new contact details.
             JSONObject contact = new JSONObject();
-            contact.put("FirstName", userName);
+            //contact.put("FirstName", userName);
             contact.put("LastName", userName);
             contact.put("LineExternalId__c", lineUserId);
 
@@ -309,7 +309,7 @@ System.out.println("url sending to sf: " + uri);
 
             // create the JSON object containing the new contact details.
             JSONObject contact = new JSONObject();
-            contact.put("FirstName", userName);
+            //contact.put("FirstName", userName);
             contact.put("LastName", userName);
             contact.put("LineExternalId__c", lineUserId);
 
